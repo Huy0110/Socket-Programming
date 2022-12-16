@@ -32,9 +32,13 @@ int main() {
 
         while (1) {
             char buffer[1024] = {0};
+            memset(buffer, 0, sizeof(buffer));
             recv(cfd, buffer, sizeof buffer, 0);
             if (buffer[strlen(buffer) - 1] == '\n')
                 buffer[strlen(buffer) - 1] = 0;
+            
+            if (strncmp(buffer, "exit", 4) == 0)
+                break;
             sprintf(buffer + strlen(buffer), " > out.txt");
             system(buffer);
 
@@ -43,14 +47,11 @@ int main() {
             if (taptin != NULL) {
                 char line[500] = "";
                 // fgets(line, sizeof(line), taptin);
-                while (!feof(taptin)) {
-                    fgets(line, sizeof(line), taptin);
+                while (fgets(line, sizeof(line), taptin)!=NULL) {
                     send(cfd, line, strlen(line), 0);
                 }
             }
             fclose(taptin);
-            if (strncmp(buffer, "exit", 4) == 0)
-                break;
         }
         close(cfd);
     }
