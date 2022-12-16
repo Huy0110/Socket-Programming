@@ -42,7 +42,7 @@ int main() {
             taptin = fopen("out.txt", "r");
             if (taptin != NULL) {
                 char line[500] = "";
-                fgets(line, sizeof(line), taptin);
+                // fgets(line, sizeof(line), taptin);
                 while (!feof(taptin)) {
                     fgets(line, sizeof(line), taptin);
                     send(cfd, line, strlen(line), 0);
