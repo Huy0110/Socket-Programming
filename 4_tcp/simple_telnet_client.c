@@ -8,24 +8,17 @@
 
 typedef struct sockaddr_in SOCKADDR_IN;
 
-char *sendData(int sfd, char *buffer) {
-    int tmp = 0;
-    do {
-        int byte = send(sfd, buffer + tmp, strlen(buffer) - tmp, 0);
-        tmp += byte;
-    } while (tmp < strlen(buffer));
-}
-
-char *getPWD(int sfd) {
-    char command[20] = "pwd\n", *buffer;
-    buffer = malloc(1024 * sizeof(char));
-    memset(buffer, 0, 1024 * sizeof(char));
-    sendData(sfd, command);
-    int bytes = recv(sfd, buffer, 1024 * sizeof(char), 0);
-    buffer[bytes - 1] = 0;
-    return buffer;
-
-}
+// char *getPWD(int sfd) {
+//     char command[20] = {0}, *buffer;
+//     strcpy(command,"pwd");
+//     buffer = malloc(1024 * sizeof(char));
+//     memset(buffer, 0, 1024 * sizeof(char));
+//     sendData(sfd, command);
+//     int bytes = recv(sfd, buffer, sizeof(buffer), 0);
+//     buffer[bytes - 1] = 0;
+//     printf("\nTEST: %s\n", buffer);
+//     return buffer;
+// }
 
 int main() {
     int sfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -43,14 +36,40 @@ int main() {
     }
 
     char buffer[1024] = {0};
+    memset(buffer, 0, sizeof(buffer));
     recv(sfd, buffer, 1024, 0);
+    if(buffer[strlen(buffer)-1] =='\n')
+    {
+        buffer[strlen(buffer)-1]=0;
+    }
 
+    char command[20] = {0};
+    strcpy(command,"pwd");
+    char buffer_pwd[1024]= {0};
+    memset(buffer_pwd, 0, sizeof(buffer_pwd));
     while (1) {
-        printf("#%s#", getPWD(sfd));
+
+        // pwd
+        memset(buffer_pwd, 0, sizeof(buffer_pwd));
+        send(sfd, command, sizeof(command), 0);
+        recv(sfd, buffer_pwd, sizeof(buffer_pwd), 0);
+        if(buffer_pwd[strlen(buffer_pwd)-1] =='\n')
+        {
+            buffer_pwd[strlen(buffer_pwd)-1]=0;
+        }
+        printf("#%s#", buffer_pwd);
+
+        // trao doi du lieu
         fgets(buffer, 1024, stdin);
-        sendData(sfd, buffer);
+        send(sfd, buffer, sizeof(buffer), 0);
+
+        memset(buffer, 0, sizeof(buffer));
         recv(sfd, buffer, 1024, 0);
-        printf("%s", buffer);
+        if(buffer[strlen(buffer)-1] =='\n')
+            {
+                buffer[strlen(buffer)-1]=0;
+            }
+        printf("%s\n", buffer);
     }
     close(sfd);
 }

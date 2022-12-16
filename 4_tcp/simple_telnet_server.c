@@ -36,7 +36,7 @@ int main() {
             recv(cfd, buffer, sizeof buffer, 0);
             if (buffer[strlen(buffer) - 1] == '\n')
                 buffer[strlen(buffer) - 1] = 0;
-            
+            printf("Da nhan: %s\n", buffer);
             if (strncmp(buffer, "exit", 4) == 0)
                 break;
             sprintf(buffer + strlen(buffer), " > out.txt");
@@ -45,11 +45,12 @@ int main() {
             FILE *taptin = NULL;
             taptin = fopen("out.txt", "r");
             if (taptin != NULL) {
-                char line[500] = "";
-                // fgets(line, sizeof(line), taptin);
-                while (fgets(line, sizeof(line), taptin)!=NULL) {
-                    send(cfd, line, strlen(line), 0);
+                char data[500] = "";
+                char newLine[500] = "";
+                while (fgets(newLine, sizeof(newLine), taptin)!=NULL) {
+                    strcat(data,newLine);
                 }
+                send(cfd,data, sizeof(data), 0);
             }
             fclose(taptin);
         }
